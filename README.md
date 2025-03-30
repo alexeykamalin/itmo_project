@@ -1,1 +1,1 @@
-# itmo_project
+# itmo
