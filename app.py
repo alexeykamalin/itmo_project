@@ -78,8 +78,11 @@ class Admin(User):
     
     Attributes:
         Наследуется от пользователя
+        users: List['User'] = field(default_factory=list)
     """
-
+    def get_all_users(self) -> None:
+        """Получение списка всех пользователей."""
+        self.users.append(User)
 
 @dataclass
 class Transaction:
@@ -112,7 +115,7 @@ class Transaction:
         pass
 
 @dataclass
-class Predition:
+class Prediction:
     """
     Класс для представления предсказаний.
     
