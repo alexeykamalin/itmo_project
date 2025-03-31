@@ -19,7 +19,7 @@ class User:
     id: int
     email: str
     password: str
-    balance: int
+    balance: Balance
     prediction: List['Predition'] = field(default_factory=list)
     transaction: List['Transaction'] = field(default_factory=list)
 
@@ -71,6 +71,15 @@ class User:
     def update_email(self, email: str) -> None:
         """Изменяет почту пользователя."""
         self.password = email
+
+class Admin(User):
+    """
+    Класс для представления админов в системе.
+    
+    Attributes:
+        Наследуется от пользователя
+    """
+
 
 @dataclass
 class Transaction:
@@ -154,11 +163,18 @@ class Balance:
         pass
 
 @dataclass
-class Ml:
+class MLModel:
     """
-    Класс ML.
+    Класс ML. Надеюсь модель будет получать картинку и возвращать есть ли на ней машина или нет.
     
     Attributes:
         Нужна помощь не понимаю, что тут  должно быть
     """
-    pass
+    
+    def put_image(self) -> None:
+        pass
+    def get_prediction(self) -> None:
+        pass
+    def get_config(self) -> None:
+        pass
+    
