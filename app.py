@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import List
 import re
 import bcrypt 
-123
+
 @dataclass
 class User:
     """
@@ -99,7 +99,7 @@ class Transaction:
     def get_all_transactions_by_user(self, user: User) -> None:
         pass
 
-    def add_transaction(self, user: User) -> User:
+    def add_transaction(self, user: User, type: str, cost: int) -> User:
         pass
 
 @dataclass
