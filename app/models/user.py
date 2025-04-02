@@ -11,7 +11,7 @@ class User:
     """
     Класс для представления пользователя в системе.
     
-    Attributes:
+    Attributes: comment for git
         id (int): Уникальный идентификатор пользователя
         email (str): Email пользователя
         password (str): Пароль пользователя
