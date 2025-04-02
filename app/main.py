@@ -26,7 +26,7 @@ async def index() -> Dict[str, str]:
         Dict[str, str]: Приветственное сообщение с информацией о пользователе
     """
     try:
-        user = User(id=1, email="Nick@gmail.com", password="12345678")
+        user = User(id=1, email="Nick@gmail.com", password="Q12345678q!")
         logger.info(f"Успешное выполнение маршрута index для пользователя: {user}")
         return {"message": f"Hello world! User: {user}"}
     except Exception as e:

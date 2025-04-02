@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from user import User
-
+    from models.user import User
+    
 @dataclass
 class Admin(User):
     """

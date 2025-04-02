@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from user import User
+    from models.user import User
 
 @dataclass
 class Transaction:
@@ -19,7 +19,7 @@ class Transaction:
     id: int
     type: str
     cost: int
-    user: User
+    user: "User"
     date: str
 
     def __post_init__(self) -> None:
@@ -28,8 +28,8 @@ class Transaction:
     def get_transaction_by_id(self, id: int) -> None:
         pass
 
-    def get_all_transactions_by_user(self, user: User) -> None:
+    def get_all_transactions_by_user(self, user: "User") -> None:
         pass
 
-    def add_transaction(self, user: User, type: str, cost: int) -> User:
+    def add_transaction(self, user: "User", type: str, cost: int) -> None:
         pass

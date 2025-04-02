@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from user import User
+    from models.user import User
 
 @dataclass
 class Prediction:
@@ -17,7 +17,7 @@ class Prediction:
     """
     id: int
     result: str
-    user: User
+    user: "User"
     date: str
 
     def __post_init__(self) -> None:
@@ -26,8 +26,8 @@ class Prediction:
     def get_prediction_by_id(self, id: int) -> None:
         pass
 
-    def get_all_predictions_by_user(self, user: User) -> None:
+    def get_all_predictions_by_user(self, user: "User") -> None:
         pass
 
-    def add_prediction(self, user: User) -> None:
+    def add_prediction(self, user: "User") -> None:
         pass

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from user import User
+    from models.user import User
 
 @dataclass
 class Balance:
@@ -16,13 +16,13 @@ class Balance:
     """
     id: int
     value: int
-    user: User
+    user: "User"
 
     def __post_init__(self) -> None:
         pass
 
-    def get_balance(self, user: User) -> None:
+    def get_balance(self, user: "User") -> None:
         pass
 
-    def set_balance(self, value: int, type: str, user: User) -> None:
+    def set_balance(self, value: int, type: str, user: "User") -> None:
         pass
