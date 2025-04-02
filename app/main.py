@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from typing import Dict
-import models.user
+from models.user import User
 import uvicorn
 import logging
 
@@ -26,13 +26,22 @@ async def index() -> Dict[str, str]:
         Dict[str, str]: Приветственное сообщение с информацией о пользователе
     """
     try:
-        user = models.user.User(id=1, email="Nick@gmail.com", password="12345678")
+        user = User(id=1, email="Nick@gmail.com", password="12345678")
         logger.info(f"Успешное выполнение маршрута index для пользователя: {user}")
         return {"message": f"Hello world! User: {user}"}
     except Exception as e:
         logger.error(f"Ошибка в маршруте index: {str(e)}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
+@app.get("/test")
+def test():
+    """
+    Тестовый роут
+    """
     
+    return 'Hello world!'
+
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     logger.warning(f"HTTPException: {exc.detail} для запроса {request.url}")
