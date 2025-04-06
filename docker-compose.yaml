@@ -8,7 +8,7 @@ services:
     env_file:
       - ./app/.env
     depends_on:
-      - database
+      -   postgres
     volumes:
       - ./app:/app
     networks:
@@ -21,7 +21,7 @@ services:
       start_period: 20s
   web:
     image: nginx:latest
-    container_name: myml-nginx
+    container_name: nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -36,7 +36,7 @@ services:
       - myml-network
   rabbitmq:
     image: rabbitmq:4.0
-    container_name: myml-rabbitmq
+    container_name: rabbitmq
     hostname: rabbitmq
     restart: always
     volumes:
@@ -47,9 +47,9 @@ services:
     ports:
       - 15672:15672
       - 5672:5672 
-  database:
+  postgres:
     image: postgres:latest
-    container_name: myml-postgres
+    container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

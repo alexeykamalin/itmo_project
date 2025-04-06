@@ -60,7 +60,8 @@ if __name__ == '__main__':
     print(settings.DB_HOST)
     print(settings.DB_NAME)
     print(settings.DB_USER)
-    # init_db(drop_all=True)
+    print(settings.DB_PORT)
+    init_db(drop_all=True)
     engine = get_database_engine()
     uvicorn.run(
         'main:app',
