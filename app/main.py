@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from typing import Dict
+from sqlmodel import Session
+from database.database import get_session, init_db, get_database_engine
+from database.config import get_settings
 from models.user import User
 import uvicorn
 import logging
@@ -38,7 +41,6 @@ def test():
     """
     Тестовый роут
     """
-    
     return 'Hello world!'
 
 
@@ -51,6 +53,15 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     )
 
 if __name__ == '__main__':
+    settings = get_settings()
+    print(settings.APP_NAME)
+    print(settings.API_VERSION)
+    print(f'Debug: {settings.DEBUG}')
+    print(settings.DB_HOST)
+    print(settings.DB_NAME)
+    print(settings.DB_USER)
+    # init_db(drop_all=True)
+    engine = get_database_engine()
     uvicorn.run(
         'main:app',
         host='0.0.0.0',

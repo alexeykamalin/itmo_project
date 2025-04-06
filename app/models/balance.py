@@ -1,11 +1,14 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from models.user import User
 
-@dataclass
-class Balance:
+class BalanceBase(SQLModel):
+    value: int = Field(default=0)
+
+class Balance(BalanceBase, table=True):
     """
     Класс для работы с балансом пользователя.
     
@@ -14,15 +17,22 @@ class Balance:
         value (int): значение баланса
         user (User): Юзер с чьим балансом работаем
     """
-    id: int
-    value: int
-    user: "User"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.time)
+    user: Optional['User']= Relationship(
+        back_populates="balance"
+    )
+    
+class BalanceCreate(BalanceBase):
+    """
+    
+    """
+    pass
 
-    def __post_init__(self) -> None:
-        pass
+class BalanceUpdate(BalanceBase):
+    result: str = None
 
-    def get_balance(self, user: "User") -> None:
-        pass
-
-    def set_balance(self, value: int, type: str, user: "User") -> None:
-        pass
+    class Config:
+        """Model configuration"""
+        validate_assignment = True

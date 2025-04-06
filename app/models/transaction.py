@@ -1,11 +1,15 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from models.user import User
 
-@dataclass
-class Transaction:
+class TransactionBase(SQLModel):
+    type: str
+    cost: int
+
+class Transaction(TransactionBase, table=True):
     """
     Класс для представления транзакция.
     
@@ -16,20 +20,27 @@ class Transaction:
         user (User): Создатель транзакции
         date (str): Дата транзакции
     """
-    id: int
-    type: str
-    cost: int
-    user: "User"
-    date: str
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(default=None, foreign_key="user.id")
+    creator: Optional['User']= Relationship(
+        back_populates="transaction"
+    )
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    def __str__(self) -> str:
+        result = (f"Id: {self.id}. Type: {self.type}. Creator: {self.user.email}. Cost: {self.cost}")
+        return result
+    
+class TransactionCreate(TransactionBase):
+    """
+    
+    """
+    pass
 
-    def __post_init__(self) -> None:
-        pass
+class TransactionUpdate(TransactionBase):
+    type: str = None
+    cost: int = None
 
-    def get_transaction_by_id(self, id: int) -> None:
-        pass
-
-    def get_all_transactions_by_user(self, user: "User") -> None:
-        pass
-
-    def add_transaction(self, user: "User", type: str, cost: int) -> None:
-        pass
+    class Config:
+        """Model configuration"""
+        validate_assignment = True

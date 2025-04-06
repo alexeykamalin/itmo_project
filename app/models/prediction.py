@@ -1,11 +1,17 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from models.user import User
 
-@dataclass
-class Prediction:
+class PredictionBase(SQLModel):
+    """
+
+    """
+    result: str
+
+class Prediction(PredictionBase, table=True):
     """
     Класс для представления предсказаний.
     
@@ -15,19 +21,26 @@ class Prediction:
         user (User): Создатель предсказания
         date (str): Дата предсказания
     """
-    id: int
-    result: str
-    user: "User"
-    date: str
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    creator: Optional['User']= Relationship(
+        back_populates="prediction"
+    )
 
-    def __post_init__(self) -> None:
-        pass
+    def __str__(self) -> str:
+        result = (f"Id: {self.id}. Result: {self.result}. Creator: {self.user.email}")
+        return result
+    
+class PredictionCreate(PredictionBase):
+    """
+    
+    """
+    pass
 
-    def get_prediction_by_id(self, id: int) -> None:
-        pass
+class PredictionUpdate(PredictionBase):
+    result: str = None
 
-    def get_all_predictions_by_user(self, user: "User") -> None:
-        pass
-
-    def add_prediction(self, user: "User") -> None:
-        pass
+    class Config:
+        """Model configuration"""
+        validate_assignment = True
