@@ -23,7 +23,7 @@ class Transaction(TransactionBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(default=None, foreign_key="user.id")
     creator: Optional['User']= Relationship(
-        back_populates="transaction"
+        back_populates="transactions"
     )
     created_at: datetime = Field(default_factory=datetime.utcnow)
     

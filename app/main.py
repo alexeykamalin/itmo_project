@@ -5,6 +5,9 @@ from sqlmodel import Session
 from database.database import get_session, init_db, get_database_engine
 from database.config import get_settings
 from models.user import User
+from models.prediction import Prediction
+from models.transaction import Transaction
+from models.balance import Balance
 import uvicorn
 import logging
 

@@ -32,7 +32,9 @@ class User(SQLModel, table=True):
     predictions: List["Prediction"] = Relationship(
         back_populates="creator",
     )
-    balance: int
+    balance: int = Relationship(
+        back_populates="creator"
+    )
 
     def __str__(self) -> str:
         return f"Id: {self.id}. Email: {self.email}"

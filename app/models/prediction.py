@@ -25,7 +25,7 @@ class Prediction(PredictionBase, table=True):
     user_id: int = Field(default=None, foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     creator: Optional['User']= Relationship(
-        back_populates="prediction"
+        back_populates="predictions"
     )
 
     def __str__(self) -> str:
