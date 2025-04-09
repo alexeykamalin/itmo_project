@@ -1,12 +1,7 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, Column, func, DateTime
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 import re
-if TYPE_CHECKING:
-    from models.prediction import Prediction
-    from models.transaction import Transaction
-    from models.balance import Balance
-
 
 class User(SQLModel, table=True):
     """
@@ -25,15 +20,15 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True, index=True, min_length=5, max_length=255)
     password: str = Field(min_length=8)
     name: str = Field(min_length=2)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    transactions: List["Transaction"] = Relationship(
+    created_at: datetime = Field(sa_column=Column(DateTime, default=func.now()))
+    transactions: Optional[List["Transaction"]] = Relationship(
         back_populates="creator",
     )
-    predictions: List["Prediction"] = Relationship(
+    predictions: Optional[List["Prediction"]] = Relationship(
         back_populates="creator",
     )
     balance: int = Relationship(
-        back_populates="creator"
+        back_populates="creator",
     )
 
     def __str__(self) -> str:

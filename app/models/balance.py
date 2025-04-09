@@ -2,9 +2,6 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from models.user import User
-
 class BalanceBase(SQLModel):
     value: int = Field(default=0)
 
@@ -20,7 +17,7 @@ class Balance(BalanceBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(default=None, foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.time)
-    user: Optional['User']= Relationship(
+    creator: Optional['User']= Relationship(
         back_populates="balance"
     )
     

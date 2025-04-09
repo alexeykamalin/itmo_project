@@ -8,6 +8,9 @@ from models.user import User
 from models.prediction import Prediction
 from models.transaction import Transaction
 from models.balance import Balance
+from services.crud.user import get_all_users, create_user
+from services.crud.prediction import create_transaction
+from services.crud.transaction import create_prediction
 import uvicorn
 import logging
 
@@ -31,13 +34,9 @@ async def index() -> Dict[str, str]:
     Returns:
         Dict[str, str]: Приветственное сообщение с информацией о пользователе
     """
-    try:
-        user = User(id=1, email="Nick@gmail.com", password="Q12345678q!")
-        logger.info(f"Успешное выполнение маршрута index для пользователя: {user}")
-        return {"message": f"Hello world! User: {user}"}
-    except Exception as e:
-        logger.error(f"Ошибка в маршруте index: {str(e)}")
-        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+    return {"message": f"Hello world! User: 123"}
+
+
 
 @app.get("/test")
 def test():
@@ -57,15 +56,36 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 if __name__ == '__main__':
     settings = get_settings()
-    print(settings.APP_NAME)
-    print(settings.API_VERSION)
-    print(f'Debug: {settings.DEBUG}')
-    print(settings.DB_HOST)
-    print(settings.DB_NAME)
-    print(settings.DB_USER)
-    print(settings.DB_PORT)
     init_db(drop_all=True)
+    test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob', balance=0)
+    test_user1 = User(email='test1@gmail.com', password='Qwerty123!', name='Alice', balance=0)
+    test_user2 = User(email='test1@gmail.com', password='Qwerty123!', name='Ann', balance=0)
+    tr1 = Transaction(type='replenishment', cost=10, user_id=test_user.id)
+    tr2 = Transaction(type='replenishment', cost=20, user_id=test_user.id)
+    tr3 = Transaction(type='write_off', cost=5, user_id=test_user.id)
+    pr1 = Prediction(result='Lorem ipsum dolor sit amet Aenean commodo ligula eget dolor.', user_id=test_user.id)
+    pr2 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.', user_id=test_user.id)
+    pr3 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', user_id=test_user.id)
+
     engine = get_database_engine()
+    with Session(engine) as session:
+        create_user(test_user, session)
+        create_user(test_user1, session)
+        create_user(test_user2, session)
+        users = get_all_users(session)
+        create_transaction(tr1, session)
+        create_transaction(tr2, session)
+        create_transaction(tr3, session)
+        create_prediction(pr1, session)
+        create_prediction(pr2, session)
+        create_prediction(pr3, session)
+    for user in users:
+        print(user)
+        for transactions in user.transactions:
+            pass
+        for prediction in user.predictions:
+            pass
+
     uvicorn.run(
         'main:app',
         host='0.0.0.0',

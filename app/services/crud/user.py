@@ -1,10 +1,10 @@
-from models.user import User
 from models.transaction import Transaction
 from models.prediction import Prediction
 from models.balance import Balance
 from sqlmodel import Session, select
-from sqlalchemy.orm import selectinload
-from typing import List, Optional
+from sqlalchemy.orm import selectinload 
+from typing import List, Optional, TYPE_CHECKING
+from models.user import User
 
 def get_all_users(session: Session) -> List[User]:
     """
@@ -76,14 +76,12 @@ def create_user(user: User, session: Session) -> User:
     Returns:
         User: Created user with ID
     """
-    try:
-        session.add(user)
-        session.commit()
-        session.refresh(user)
-        return user
-    except Exception as e:
-        session.rollback()
-        raise
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
 
 def delete_user(user_id: int, session: Session) -> bool:
     """
