@@ -17,9 +17,7 @@ def get_all_users(session: Session) -> List[User]:
         List[User]: List of all users
     """
     try:
-        statement = select(User).options(
-            selectinload(User.transaction).selectinload(User.prediction)
-        )
+        statement = select(User)
         users = session.exec(statement).all()
         return users
     except Exception as e:
@@ -77,10 +75,15 @@ def create_user(user: User, session: Session) -> User:
         User: Created user with ID
     """
 
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
+    try:
+        
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+    except Exception as e:
+        session.rollback()
+        raise
 
 
 def delete_user(user_id: int, session: Session) -> bool:
@@ -101,6 +104,18 @@ def delete_user(user_id: int, session: Session) -> bool:
             session.commit()
             return True
         return False
+    except Exception as e:
+        session.rollback()
+        raise
+
+def update_user(user: User, session: Session) -> User:
+    """
+    """
+    try:    
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
     except Exception as e:
         session.rollback()
         raise

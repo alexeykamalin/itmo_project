@@ -1,6 +1,8 @@
 from sqlmodel import Session, select
 from typing import List, Optional
 from datetime import datetime
+from models.transaction import Transaction
+
 
 def get_all_transactions(session: Session) -> List['Transaction']:
     """

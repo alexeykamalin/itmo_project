@@ -23,7 +23,7 @@ def get_prediction_by_id(prediction_id: int, session: Session) -> Optional['Pred
         raise
 
 
-def create_transaction(prediction: Prediction, session: Session) -> Prediction:
+def create_prediction(prediction: Prediction, session: Session) -> Prediction:
     """
     """
     try:
