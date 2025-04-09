@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
 
-@dataclass
 class MLModel:
     """
     Класс ML. Надеюсь модель будет получать картинку и возвращать есть ли на ней машина или нет.
