@@ -8,9 +8,10 @@ from models.user import User
 from models.prediction import Prediction
 from models.transaction import Transaction
 from models.balance import Balance
-from services.crud.user import get_all_users, create_user
-from services.crud.prediction import create_transaction
-from services.crud.transaction import create_prediction
+from services.crud.user import create_user, update_user
+from services.crud.transaction import create_transaction
+from services.crud.balance import create_balance
+
 import uvicorn
 import logging
 
@@ -57,34 +58,29 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 if __name__ == '__main__':
     settings = get_settings()
     init_db(drop_all=True)
-    test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob', balance=0)
-    test_user1 = User(email='test1@gmail.com', password='Qwerty123!', name='Alice', balance=0)
-    test_user2 = User(email='test1@gmail.com', password='Qwerty123!', name='Ann', balance=0)
-    tr1 = Transaction(type='replenishment', cost=10, user_id=test_user.id)
-    tr2 = Transaction(type='replenishment', cost=20, user_id=test_user.id)
-    tr3 = Transaction(type='write_off', cost=5, user_id=test_user.id)
-    pr1 = Prediction(result='Lorem ipsum dolor sit amet Aenean commodo ligula eget dolor.', user_id=test_user.id)
-    pr2 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.', user_id=test_user.id)
-    pr3 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', user_id=test_user.id)
+    test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob')
+    test_user1 = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice')
+    test_user2 = User(email='test1@gmail2.com', password='Qwerty123!', name='Ann')
+    
+    # tr2 = Transaction(type='replenishment', cost=20, user_id=test_user.id)
+    # tr3 = Transaction(type='write_off', cost=5, user_id=test_user.id)
+    # pr1 = Prediction(result='Lorem ipsum dolor sit amet Aenean commodo ligula eget dolor.', user_id=test_user.id)
+    # pr2 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.', user_id=test_user.id)
+    # pr3 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', user_id=test_user.id)
 
     engine = get_database_engine()
     with Session(engine) as session:
-        create_user(test_user, session)
-        create_user(test_user1, session)
-        create_user(test_user2, session)
-        users = get_all_users(session)
-        create_transaction(tr1, session)
-        create_transaction(tr2, session)
-        create_transaction(tr3, session)
-        create_prediction(pr1, session)
-        create_prediction(pr2, session)
-        create_prediction(pr3, session)
-    for user in users:
-        print(user)
-        for transactions in user.transactions:
-            pass
-        for prediction in user.predictions:
-            pass
+        user1 = create_user(test_user, session)
+        print(user1)
+        tra1 = create_transaction(Transaction(type='replenishment', cost=10, user_id=user1.id, creator=user1), session)
+        balance1 = create_balance(Balance(value=0, user_id=user1.id, creator=user1), session)
+        print(user1)
+        
+        # create_transaction(tr2, session)
+        # create_transaction(tr3, session)
+        # create_prediction(pr1, session)
+        # create_prediction(pr2, session)
+        # create_prediction(pr3, session)
 
     uvicorn.run(
         'main:app',

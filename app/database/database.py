@@ -39,10 +39,8 @@ def init_db(drop_all: bool = False) -> None:
     """
     try:
         engine = get_database_engine()
-        print(engine)
         if drop_all:
             SQLModel.metadata.drop_all(engine)
-        
         SQLModel.metadata.create_all(engine)
     except Exception as e:
         raise

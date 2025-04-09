@@ -27,12 +27,12 @@ class User(SQLModel, table=True):
     predictions: Optional[List["Prediction"]] = Relationship(
         back_populates="creator",
     )
-    balance: int = Relationship(
+    balance: Optional["Balance"] = Relationship(
         back_populates="creator",
     )
 
     def __str__(self) -> str:
-        return f"Id: {self.id}. Email: {self.email}"
+        return f"Id: {self.id}. Email: {self.email}. Tranactions: {self.transactions}. Balance: {self.balance}"
     
     def validate_email(self) -> bool:
         pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
