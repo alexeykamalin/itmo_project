@@ -112,7 +112,6 @@ def update_user(user: User, session: Session) -> User:
     """
     """
     try:    
-        session.add(user)
         session.commit()
         session.refresh(user)
         return user
