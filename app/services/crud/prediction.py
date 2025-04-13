@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from typing import List, Optional
 from datetime import datetime
+from models.prediction import Prediction
 
 def get_all_predictions(session: Session) -> List['Prediction']:
     """

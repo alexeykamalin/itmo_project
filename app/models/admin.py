@@ -13,6 +13,3 @@ class Admin(User):
         Наследуется от пользователя
         users: List['User'] = field(default_factory=list)
     """
-    def get_all_users(self) -> None:
-        """Получение списка всех пользователей."""
-        self.users.append(User)

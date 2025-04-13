@@ -21,6 +21,7 @@ class User(SQLModel, table=True):
     password: str = Field(min_length=8)
     name: str = Field(min_length=2)
     created_at: datetime = Field(sa_column=Column(DateTime, default=func.now()))
+    is_admin: bool = Field(default=False)
     transactions: Optional[List["Transaction"]] = Relationship(
         back_populates="creator",
     )

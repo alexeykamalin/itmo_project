@@ -10,6 +10,7 @@ from models.transaction import Transaction
 from models.balance import Balance
 from services.crud.user import create_user, update_user
 from services.crud.transaction import create_transaction
+from services.crud.prediction import create_prediction
 from services.crud.balance import create_balance
 
 import uvicorn
@@ -71,10 +72,10 @@ if __name__ == '__main__':
     engine = get_database_engine()
     with Session(engine) as session:
         user1 = create_user(test_user, session)
-        print(user1)
         tra1 = create_transaction(Transaction(type='replenishment', cost=10, user_id=user1.id, creator=user1), session)
+        pre1 = create_prediction(Prediction(result='bla-bla-bla', user_id=user1.id, creator=user1), session)
         balance1 = create_balance(Balance(value=0, user_id=user1.id, creator=user1), session)
-        print(user1)
+        update_user(user1, session)
         
         # create_transaction(tr2, session)
         # create_transaction(tr3, session)
