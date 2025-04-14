@@ -1,6 +1,8 @@
 from sqlmodel import SQLModel, Session, create_engine 
 from contextlib import contextmanager
 from .config import get_settings
+from models.user import User
+from services.crud.user import create_user, get_all_users
 
 def get_database_engine():
     """
@@ -42,5 +44,13 @@ def init_db(drop_all: bool = False) -> None:
         if drop_all:
             SQLModel.metadata.drop_all(engine)
         SQLModel.metadata.create_all(engine)
+        test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob')
+        test_user1 = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice', is_admin=True)
+        with Session(engine) as session:
+            users = get_all_users(session)
+            if not test_user in users:
+                create_user(test_user, session)
+            if not test_user1 in users:
+                create_user(test_user1, session)
     except Exception as e:
         raise
