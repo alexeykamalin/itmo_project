@@ -1,9 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict
+from sqlmodel import Session
 from routes.home import home_route
 from routes.user import user_route
+
 from database.database import init_db
 from database.config import get_settings
+from models.user import User
+from models.prediction import Prediction
+from models.transaction import Transaction
+from models.balance import Balance
+from services.crud.user import create_user, get_all_users
+from services.crud.transaction import create_transaction
+from services.crud.prediction import create_prediction
+from services.crud.balance import create_balance
 import uvicorn
 import logging
 
@@ -38,29 +50,19 @@ def create_application() -> FastAPI:
     # Register routes
     app.include_router(home_route, tags=['Home'])
     app.include_router(user_route, prefix='/api/users', tags=['Users'])
-    app.include_router(event_router, prefix='/api/events', tags=['Events'])
+    # app.include_router(transaction_route, prefix='/api/events', tags=['Tranactions'])
+    # app.include_router(prediction_route, prefix='/api/events', tags=['Predictions'])
 
     return app
 
 app = create_application()
 
-@app.on_event("startup") 
-def on_startup():
-    try:
-        logger.info("Initializing database...")
-        init_db()
-        logger.info("Application startup completed successfully")
-    except Exception as e:
-        logger.error(f"Startup failed: {str(e)}")
-        raise
-    
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on application shutdown."""
-    logger.info("Application shutting down...")
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     uvicorn.run(
         'api:app',
         host='0.0.0.0',
