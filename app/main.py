@@ -59,8 +59,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 if __name__ == '__main__':
     settings = get_settings()
     init_db(drop_all=True)
-    test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob')
-    test_user1 = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice', is_admin=True)
+    
     test_user2 = User(email='test1@gmail2.com', password='Qwerty123!', name='Ann')
     
     # tr2 = Transaction(type='replenishment', cost=20, user_id=test_user.id)
@@ -72,14 +71,9 @@ if __name__ == '__main__':
     engine = get_database_engine()
     with Session(engine) as session:
         users = get_all_users(session)
-        if not test_user in users:
-            user1 = create_user(test_user, session)
-            tra1 = create_transaction(Transaction(type='replenishment', cost=10, user_id=user1.id, creator=user1), session)
-            pre1 = create_prediction(Prediction(result='bla-bla-bla', user_id=user1.id, creator=user1), session)
-            balance1 = create_balance(Balance(value=0, user_id=user1.id, creator=user1), session)
-        if not test_user1 in users:
-            user2 = create_user(test_user1, session)
-        
+        tra1 = create_transaction(Transaction(type='replenishment', cost=10, user_id=users[0].id, creator=users[0]), session)
+        pre1 = create_prediction(Prediction(result='bla-bla-bla', user_id=users[0].id, creator=users[0]), session)
+        balance1 = create_balance(Balance(value=0, user_id=users[0].id, creator=users[0]), session)
         
         
         # create_transaction(tr2, session)
