@@ -12,7 +12,6 @@ def get_all_users(session: Session) -> List[User]:
     
     Args:
         session: Database session
-    
     Returns:
         List[User]: List of all users
     """
