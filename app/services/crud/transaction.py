@@ -4,11 +4,11 @@ from datetime import datetime
 from models.transaction import Transaction
 
 
-def get_all_transactions(session: Session) -> List['Transaction']:
+def get_all_transactions_by_user_id(user_id: int, session: Session) -> List['Transaction']:
     """
     """
     try:
-        statement = select(Transaction)
+        statement = select(Transaction).where(Transaction.user_id == user_id)
         transactions = session.exec(statement).all()
         return transactions
     except Exception as e:
@@ -19,7 +19,7 @@ def get_transaction_by_id(transaction_id: int, session: Session) -> Optional['Tr
     """
     try:
         statement = select(Transaction).where(Transaction.id == transaction_id)
-        transaction = session.exec(statement).first()
+        transaction = session.exec(statement).all()
         return transaction
     except Exception as e:
         raise
