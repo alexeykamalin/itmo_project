@@ -45,12 +45,12 @@ def init_db(drop_all: bool = False) -> None:
             SQLModel.metadata.drop_all(engine)
         SQLModel.metadata.create_all(engine)
         test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob')
-        test_user1 = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice', is_admin=True)
+        admin = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice', is_admin=True)
         with Session(engine) as session:
             users = get_all_users(session)
             if not test_user in users:
                 create_user(test_user, session)
-            if not test_user1 in users:
-                create_user(test_user1, session)
+            if not admin in users:
+                create_user(admin, session)
     except Exception as e:
         raise

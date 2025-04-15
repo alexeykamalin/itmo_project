@@ -5,7 +5,7 @@ from typing import Dict
 from sqlmodel import Session
 from routes.home import home_route
 from routes.user import user_route
-
+from routes.tranaction import transaction_route
 from database.database import init_db
 from database.config import get_settings
 from models.user import User
@@ -50,7 +50,7 @@ def create_application() -> FastAPI:
     # Register routes
     app.include_router(home_route, tags=['Home'])
     app.include_router(user_route, prefix='/api/users', tags=['Users'])
-    # app.include_router(transaction_route, prefix='/api/events', tags=['Tranactions'])
+    app.include_router(transaction_route, prefix='/api/tranactions', tags=['Tranactions'])
     # app.include_router(prediction_route, prefix='/api/events', tags=['Predictions'])
 
     return app
@@ -61,7 +61,6 @@ app = create_application()
 if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     uvicorn.run(
         'api:app',
