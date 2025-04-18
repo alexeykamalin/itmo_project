@@ -3,11 +3,11 @@ from typing import List, Optional
 from datetime import datetime
 from models.prediction import Prediction
 
-def get_all_predictions(session: Session) -> List['Prediction']:
+def get_all_predictions_by_user_id(user_id: int, session: Session) -> List['Prediction']:
     """
     """
     try:
-        statement = select(Prediction)
+        statement = select(Prediction).where(Prediction.user_id == user_id)
         predictions = session.exec(statement).all()
         return predictions
     except Exception as e:

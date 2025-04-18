@@ -36,3 +36,24 @@ async def add_balance(data: Balance, user_id: int, session=Depends(get_session))
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error during balance"
         )
+
+@balance_route.post(
+    '/get_balance_by_user_id',
+    response_model=Dict[str, str],
+    status_code=status.HTTP_201_CREATED,
+    summary="",
+    description="")   
+async def get_baalnce_by_user_id(user_id: int, session=Depends(get_session)) -> Balance:
+    """l
+    """
+    try:
+        user = UserService.get_user_by_id(user_id, session)
+        balance = BalanceService.get_balance_by_user_id(user_id, session)
+        logger.info(f"Retrieved {user}: {balance}")
+        return balance
+    except Exception as e:
+        logger.error(f"Error retrieving users: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error retrieving usetransactionsrs"
+        )
