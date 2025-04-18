@@ -14,3 +14,13 @@ def create_balance(balance: Balance, session: Session) -> Balance:
     except Exception as e:
         session.rollback()
         raise
+
+def get_balance_by_user_id(user_id: int, session: Session) -> Balance:
+    """
+    """
+    try:
+        statement = select(Balance).where(Balance.user_id == user_id)
+        balance = session.exec(statement).all()
+        return balance
+    except Exception as e:
+        raise
