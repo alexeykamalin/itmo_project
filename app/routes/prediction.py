@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from database.database import get_session
 from models.prediction import Prediction
 from services.crud import prediction as PredictionService
+from services.crud import user as UserService
 from typing import List, Dict
 import logging
 
@@ -45,7 +46,7 @@ async def get_all_predictions_by_user_id(user_id: int, session=Depends(get_sessi
     """l
     """
     try:
-        user = PredictionService.get_user_by_id(user_id, session)
+        user = UserService.get_user_by_id(user_id, session)
         predictions = PredictionService.get_all_predictions_by_user_id(user_id, session)
         logger.info(f"Retrieved {user}: {predictions}")
         return predictions
