@@ -21,13 +21,13 @@ async def add_prediction(data: Prediction, user_id: int, session=Depends(get_ses
     """
     """
     try:
-        Transaction = Transaction(
+        prediction = Prediction(
             result=data.result,
             user_id=user_id,
         )
         PredictionService.create_prediction(Prediction, session)
         logger.info(f"New transaction: {user_id}, {data.result}")
-        return {"message": "New transaction complite"}
+        return {"message": "New prediction complite"}
 
     except Exception as e:
         logger.error(f"Error during add_tranaction: {str(e)}")
@@ -36,8 +36,8 @@ async def add_prediction(data: Prediction, user_id: int, session=Depends(get_ses
             detail="Error during add_tranaction"
         )
 
-@prediction_route.post(
-    "/get_all_tranactions_by_user_id",
+@prediction_route.get(
+    "/get_all_predictions_by_user_id",
     response_model=List[Prediction],
     summary="",
     response_description=""

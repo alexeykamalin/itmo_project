@@ -22,12 +22,12 @@ async def add_transaction(data: Transaction, user_id: int, session=Depends(get_s
     """
     """
     try:
-        Transaction = Transaction(
+        transaction = Transaction(
             type=data.type,
             cost=data.cost,
             user_id=user_id,
         )
-        TransactionService.create_transaction(Transaction, session)
+        TransactionService.create_transaction(transaction, session)
         logger.info(f"New transaction: {user_id}, {data.cost}, {data.type}")
         return {"message": "New transaction complite"}
 
@@ -38,7 +38,7 @@ async def add_transaction(data: Transaction, user_id: int, session=Depends(get_s
             detail="Error during add_tranaction"
         )
 
-@transaction_route.post(
+@transaction_route.get(
     "/get_all_tranactions_by_user_id",
     response_model=List[Transaction],
     summary="",

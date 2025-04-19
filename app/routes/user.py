@@ -104,3 +104,30 @@ async def get_all_users(session=Depends(get_session)) -> List[User]:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error retrieving users"
         )
+    
+@user_route.post(
+    '/create_user',
+    response_model=Dict[str, str],
+    status_code=status.HTTP_201_CREATED,
+    summary="",
+    description="")  
+async def create_user(data: User, session=Depends(get_session)) -> Dict[str, str]:
+    """
+    """
+    try:
+        user = User(
+            email=data.email,
+            password=data.password,
+            name=data.name,
+            is_admin=data.is_admin,
+        )
+        new_user = UserService.create_user(user, session)
+        logger.info(f"New user: {new_user.id}")
+        return {"message": "New user complite"}
+
+    except Exception as e:
+        logger.error(f"Error during create_user: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error during create_user"
+        )
