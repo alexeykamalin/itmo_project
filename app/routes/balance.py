@@ -22,13 +22,13 @@ async def add_balance(data: Balance, user_id: int, session=Depends(get_session))
     """
     """
     try:
-        Balance = Balance(
+        balance = Balance(
             value=data.value,
             user_id=user_id,
         )
-        BalanceService.create_balance(Balance, session)
-        logger.info(f"New Balance: {user_id}, {data.velue}")
-        return {"message": "New transaction complite"}
+        BalanceService.create_balance(balance, session)
+        logger.info(f"New Balance: {user_id}, {data.value}")
+        return {"message": "New balance complite"}
 
     except Exception as e:
         logger.error(f"Error during add_tranaction: {str(e)}")
@@ -37,13 +37,13 @@ async def add_balance(data: Balance, user_id: int, session=Depends(get_session))
             detail="Error during balance"
         )
 
-@balance_route.post(
+@balance_route.get(
     '/get_balance_by_user_id',
-    response_model=Dict[str, str],
+    response_model=List[Balance],
     status_code=status.HTTP_201_CREATED,
     summary="",
     description="")   
-async def get_baalnce_by_user_id(user_id: int, session=Depends(get_session)) -> Balance:
+async def get_balance_by_user_id(user_id: int, session=Depends(get_session)) -> Balance:
     """l
     """
     try:
@@ -55,5 +55,24 @@ async def get_baalnce_by_user_id(user_id: int, session=Depends(get_session)) -> 
         logger.error(f"Error retrieving users: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving usetransactionsrs"
+            detail="Error retrieving userbalance"
+        )
+
+async def update_balance(data: Balance, user_id: int, session=Depends(get_session)) -> Dict[str, str]:
+    """
+    """
+    try:
+        balance = Balance(
+            value=data.value,
+            user_id=user_id,
+        )
+        BalanceService.update_balance(balance, session)
+        logger.info(f"Balance: {user_id}, {data.value}")
+        return {"message": "Update balance complite"}
+
+    except Exception as e:
+        logger.error(f"Error during add_tranaction: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error during balance"
         )
