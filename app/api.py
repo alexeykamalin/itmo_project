@@ -8,6 +8,7 @@ from routes.user import user_route
 from routes.balance import balance_route
 from routes.prediction import prediction_route
 from routes.tranaction import transaction_route
+from routes.ml import ml_route
 from database.database import init_db
 from database.config import get_settings
 from models.user import User
@@ -55,11 +56,13 @@ def create_application() -> FastAPI:
     app.include_router(transaction_route, prefix='/api/tranactions', tags=['Tranactions'])
     app.include_router(balance_route, prefix='/api/balance', tags=['Balance'])
     app.include_router(prediction_route, prefix='/api/prediction', tags=['Prediction'])
+    app.include_router(ml_route, prefix='/api/ml', tags=['ML'])
 
     return app
 
 app = create_application()
 init_db(drop_all=True)
+
 
 
 if __name__ == '__main__':

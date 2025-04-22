@@ -25,7 +25,7 @@ async def add_prediction(data: Prediction, user_id: int, session=Depends(get_ses
             result=data.result,
             user_id=user_id,
         )
-        PredictionService.create_prediction(Prediction, session)
+        PredictionService.create_prediction(prediction, session)
         logger.info(f"New transaction: {user_id}, {data.result}")
         return {"message": "New prediction complite"}
 
