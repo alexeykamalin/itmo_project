@@ -58,7 +58,13 @@ async def get_balance_by_user_id(user_id: int, session=Depends(get_session)) -> 
             detail="Error retrieving userbalance"
         )
 
-async def update_balance(data: Balance, user_id: int, session=Depends(get_session)) -> Dict[str, str]:
+@balance_route.post(
+    '/update_balance',
+    response_model=List[Balance],
+    status_code=status.HTTP_201_CREATED,
+    summary="",
+    description="")   
+async def update_balance(data: Balance, user_id: int, session=Depends(get_session)) -> Balance:
     """
     """
     try:

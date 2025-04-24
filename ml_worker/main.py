@@ -72,7 +72,6 @@ def callback(ch, method, properties, body):
     )
     logger.info(f"Received: '{body}'")
     ch.basic_ack(delivery_tag=method.delivery_tag) # Ручное подтверждение обработки сообщения
-    init_db()
     prediction = output_text
     session = get_session()
     result = PredictionService.create_prediction(prediction, session)

@@ -2,7 +2,14 @@ from sqlmodel import SQLModel, Session, create_engine
 from contextlib import contextmanager
 from .config import get_settings
 from models.user import User
+from models.balance import Balance
+from models.transaction import Transaction
+from models.prediction import Prediction
+from auth.hash_password import HashPassword
 from services.crud.user import create_user, get_all_users, get_user_by_email
+from services.crud.balance import create_balance
+from services.crud.transaction import create_transaction
+from services.crud.prediction import create_prediction
 
 def get_database_engine():
     """
@@ -44,12 +51,26 @@ def init_db(drop_all: bool = False) -> None:
         if drop_all:
             SQLModel.metadata.drop_all(engine)
         SQLModel.metadata.create_all(engine)
-        test_user = User(email='test1@gmail.com', password='Qwerty123!', name='Bob')
-        admin = User(email='test1@gmail1.com', password='Qwerty123!', name='Alice', is_admin=True)
+        paswd = HashPassword().create_hash('Qwerty123!')
+        test_user = User(email='test1@gmail.com', password=paswd, name='Bob')
+        admin = User(email='test1@gmail1.com', password=paswd, name='Alice', is_admin=True)
         with Session(engine) as session:
             check = get_user_by_email('test1@gmail.com', session)
             if not check:
                 create_user(test_user, session)
+                balance = Balance(value=1000, creator=test_user)
+                tr1 = Transaction(type='in', cost=100, creator=test_user)
+                tr2 = Transaction(type='out', cost=500, creator=test_user)
+                tr3 = Transaction(type='out', cost=500, creator=test_user)
+                pr1 = Prediction(result='bla-bla', creator=test_user)
+                pr2 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor', creator=test_user)
+                pr3 = Prediction(result='Lorem ipsum dolor sit amet.', creator=test_user)
+                create_transaction(tr1, session)
+                create_transaction(tr2, session)
+                create_transaction(tr3, session)
+                create_prediction(pr1, session)
+                create_prediction(pr2, session)
+                create_balance(balance, session)
                 create_user(admin, session)
     except Exception as e:
         raise

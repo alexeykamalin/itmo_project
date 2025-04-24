@@ -1,6 +1,6 @@
 SQLAlchemy==2.0.31
 fastapi
-bcrypt
+passlib
 uvicorn==0.30.1
 sqlmodel
 rabbitmq
@@ -11,3 +11,6 @@ pydantic
 psycopg
 psycopg-binary
 pika
+jinja2
+python-jose
+python-multipart
