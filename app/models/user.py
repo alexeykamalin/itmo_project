@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship, Column, func, DateTime
+from pydantic import BaseModel
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 import re
@@ -32,8 +33,6 @@ class User(SQLModel, table=True):
         back_populates="creator",
     )
 
-    def __str__(self) -> str:
-        return f"Id: {self.id}. Email: {self.email}. Tranactions: {self.transactions}. Balance: {self.balance}"
     
     def validate_email(self) -> bool:
         pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
@@ -50,3 +49,7 @@ class User(SQLModel, table=True):
         """Model configuration"""
         validate_assignment = True
         arbitrary_types_allowed = True
+
+class TokenResponse(BaseModel): 
+    access_token: str 
+    token_type: str

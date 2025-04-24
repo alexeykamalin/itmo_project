@@ -1,26 +1,92 @@
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.templating import Jinja2Templates
+from auth.authenticate import authenticate_cookie, authenticate
+from auth.hash_password import HashPassword
+from auth.jwt_handler import create_access_token
+from database.database import get_session
+from services.auth.loginform import LoginForm
+from services.crud import user as UsersService
+from services.crud import balance as BalanceService
+from services.crud import transaction as TransactionService
+from services.crud import prediction as PredictionService
+from database.config import get_settings
 from typing import Dict
-from fastapi import APIRouter, HTTPException
 
+settings = get_settings()
 home_route = APIRouter()
+hash_password = HashPassword()
+templates = Jinja2Templates(directory='views')
 
 @home_route.get(
     "/", 
-    response_model=Dict[str, str],
-    summary="Root endpoint",
-    description="Returns a welcome message"
+    response_class=HTMLResponse
 )
-async def index() -> str:
-    """
-    Root endpoint returning welcome message.
+async def index(request: Request, session=Depends(get_session)):
+    token = request.cookies.get('token')
+    if token:
+        user = await authenticate_cookie(token)
+        cur_user = UsersService.get_user_by_email(user, session)
+        balance = BalanceService.get_balance_by_user_id(cur_user.id, session)
+        context = {
+            "balance": balance,
+            "user": cur_user,
+            "request": request
+        }
+        return templates.TemplateResponse("index.html", context)
+    else:
+        context = {
+            "result": False,
+            "request": request
+        }
+        return templates.TemplateResponse("login.html", context)
 
-    Returns:
-        Dict[str, str]: Welcome message
-    """
-    try:
-        return {"message": "Welcome to hell"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
+@home_route.get(
+    "/transactions", 
+    response_class=HTMLResponse
+)
+async def transaction(request: Request, session=Depends(get_session)):
+    token = request.cookies.get('token')
+    if token:
+        user = await authenticate_cookie(token)
+        cur_user = UsersService.get_user_by_email(user, session)
+        tranactions = TransactionService.get_all_transactions_by_user_id(cur_user.id, session)
+        context = {
+            "transactions": tranactions,
+            "user": cur_user,
+            "request": request
+        }
+        return templates.TemplateResponse("transactions.html", context)
+    else:
+        context = {
+            "result": False,
+            "request": request
+        }
+        return templates.TemplateResponse("login.html", context)
 
+@home_route.get(
+    "/predictions", 
+    response_class=HTMLResponse
+)
+async def prediction(request: Request, session=Depends(get_session)):
+    token = request.cookies.get('token')
+    if token:
+        user = await authenticate_cookie(token)
+        cur_user = UsersService.get_user_by_email(user, session)
+        predictions = PredictionService.get_all_predictions_by_user_id(cur_user.id, session)
+        context = {
+            "predictions": predictions,
+            "user": cur_user,
+            "request": request
+        }
+        return templates.TemplateResponse("predictions.html", context)
+    else:
+        context = {
+            "result": False,
+            "request": request
+        }
+        return templates.TemplateResponse("login.html", context)
 
 @home_route.get(
     "/health",

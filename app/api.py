@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
@@ -63,7 +64,11 @@ def create_application() -> FastAPI:
 app = create_application()
 init_db(drop_all=True)
 
-
+app.mount(
+    "/static",
+    StaticFiles(directory="/app/views/assets"), 
+    name="static"
+)
 
 if __name__ == '__main__':
     logging.basicConfig(

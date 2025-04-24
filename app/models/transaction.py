@@ -22,6 +22,3 @@ class Transaction(SQLModel, table=True):
     )
     created_at: datetime = Field(sa_column=Column(DateTime, default=func.now()))
     
-    def __str__(self) -> str:
-        result = (f"Id: {self.id}. Type: {self.type}. Creator: {self.user.email}. Cost: {self.cost}")
-        return result

@@ -1,6 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends
-from database.database import get_session
-from models.user import User
+from fastapi import APIRouter, HTTPException, status, Depends, Request
+from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from auth.hash_password import HashPassword
+from auth.jwt_handler import create_access_token
+from database.database import get_session, get_settings
+from models.user import TokenResponse, User
 from services.crud import user as UserService
 from typing import List, Dict
 import logging
@@ -52,31 +56,29 @@ async def signup(data: User, session=Depends(get_session)) -> Dict[str, str]:
             detail="Error creating user"
         )
 
-@user_route.post('/signin')
-async def signin(data: User, session=Depends(get_session)) -> Dict[str, str]:
-    """
-    Authenticate existing user.
-
-    Args:
-        form_data: User credentials
-        session: Database session
-
-    Returns:
-        dict: Success message
-
-    Raises:
-        HTTPException: If authentication fails
-    """
-    user = UserService.get_user_by_email(data.email, session)
-    if user is None:
-        logger.warning(f"Login attempt with non-existent email: {data.email}")
+@user_route.post("/signin")
+async def sign_user_in(user: OAuth2PasswordRequestForm = Depends(), session=Depends(get_session)) -> dict: 
+    user_exist = UserService.get_user_by_email(user.username, session)
+    if user_exist is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
     
-    if user.password != data.password:
-        logger.warning(f"Failed login attempt for user: {data.email}")
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Wrong credentials passed")
+    if HashPassword().verify_hash(user.password, user_exist.password):
+        access_token = create_access_token(user_exist.email)
+        response = RedirectResponse("/", status_code=303)
+        response.set_cookie(key="token", value=access_token, httponly=True)
+        return response 
+
     
-    return {"message": "User signed in successfully"}
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid details passed."
+    )
+
+@user_route.post("/logout")
+async def logout_user() -> dict: 
+    response = RedirectResponse("/", status_code=303)
+    response.set_cookie(key="token", value='')
+    return response 
 
 @user_route.get(
     "/get_all_users",
