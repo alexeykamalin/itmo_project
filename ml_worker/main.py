@@ -1,17 +1,18 @@
 from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from fastapi import HTTPException
 from qwen_vl_utils import process_vision_info
 import torch
 import pika
-from database.database import init_db, get_session, get_settings # type: ignore
 import logging
-from services.crud import prediction as PredictionService # type: ignore
+from services.crud.prediction import updateprediction
+from database.database import get_session
+from models.prediction import PredictionUpdate
 
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-init_db()
 logger = logging.getLogger(__name__)
 # Настройка логирования 
 
@@ -31,50 +32,48 @@ connection = pika.BlockingConnection(connection_params)
 channel = connection.channel()
 queue_name = 'ml_task_queue'
 channel.queue_declare(queue=queue_name)  # Создание очереди (если не существует)
-
-
+model = Qwen2VLForConditionalGeneration.from_pretrained(
+    "Qwen/Qwen2-VL-2B-Instruct", torch_dtype="auto", device_map="auto"
+)
+processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
 # Функция, которая будет вызвана при получении сообщения
 def callback(ch, method, properties, body):
-    model = Qwen2VLForConditionalGeneration.from_pretrained(
-        "Qwen/Qwen2-VL-2B-Instruct", torch_dtype="auto", device_map="auto"
-    )
-    processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "image",
-                    "image": body,
-                },
-                {"type": "text", "text": "Describe this image."},
-            ],
-        }
-    ]
-    text = processor.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-    image_inputs, video_inputs = process_vision_info(messages)
-    inputs = processor(
-        text=[text],
-        images=image_inputs,
-        videos=video_inputs,
-        padding=True,
-        return_tensors="pt",
-    )
-    inputs = inputs.to("cuda")
-    generated_ids = model.generate(**inputs, max_new_tokens=128)
-    generated_ids_trimmed = [
-        out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-    ]
-    output_text = processor.batch_decode(
-        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-    )
-    logger.info(f"Received: '{body}'")
-    ch.basic_ack(delivery_tag=method.delivery_tag) # Ручное подтверждение обработки сообщения
-    prediction = output_text
-    session = get_session()
-    result = PredictionService.create_prediction(prediction, session)
+    try:
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "image": body,
+                    },
+                    {"type": "text", "text": "Describe this image."},
+                ],
+            }
+        ]
+        text = processor.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        image_inputs, video_inputs = process_vision_info(messages)
+        inputs = processor(
+            text=[text],
+            images=image_inputs,
+            videos=video_inputs,
+            padding=True,
+            return_tensors="pt",
+        )
+        inputs = inputs.to("cuda")
+        generated_ids = model.generate(**inputs, max_new_tokens=128)
+        generated_ids_trimmed = [
+            out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+        ]
+        output_text = processor.batch_decode(
+            generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )
+        print('Тут пока заглушка, хочу получить ответ от МЛ', output_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
 
 
 # Подписка на очередь и установка обработчика сообщений

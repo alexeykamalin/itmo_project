@@ -35,3 +35,15 @@ def create_prediction(prediction: Prediction, session: Session) -> Prediction:
     except Exception as e:
         session.rollback()
         raise
+
+def updateprediction(prediction: Prediction, user_id: int, session: Session) -> Prediction:
+    """
+    """
+    try:
+        new_prediction = session.exec(select(Prediction).where(Prediction.user_id == user_id)).one()
+        new_prediction.status = prediction.status
+        session.commit()
+        return prediction
+    except Exception as e:
+        session.rollback()
+        raise

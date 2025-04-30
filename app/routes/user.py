@@ -29,11 +29,7 @@ async def signup(data: UserSignup, session=Depends(get_session)) -> Dict[str, st
     try:
         if UserService.get_user_by_email(data.email, session):
             logger.warning(f"Signup attempt with existing email: {data.email}")
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="User with this email already exists"
-            )
-
+            return {"result": "false",'detail': "User with this email already exists"}
         user = User(
             email=data.email,
             password=HashPassword().create_hash(data.password),

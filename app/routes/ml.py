@@ -10,7 +10,7 @@ ml_route = APIRouter()
     summary="ML endpoint",
     description="Send ml request"
 )
-async def index(message:str) -> str:
+async def index(message:str, id: int) -> str:
     """
     Root endpoint returning welcome message.
 
@@ -18,7 +18,7 @@ async def index(message:str) -> str:
         Dict[str, str]: Welcome message
     """
     try:
-        send_task(message)
-        return {"message": f"Task sent successfully!"}
+        send_task(message, id)
+        return {"result": 'true'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
