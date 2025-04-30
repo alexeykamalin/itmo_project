@@ -59,15 +59,14 @@ def init_db(drop_all: bool = False) -> None:
             if not check:
                 create_user(test_user, session)
                 create_user(admin, session)
-                
                 balance1 = Balance(value=1000, creator=test_user, user_id=test_user.id)
                 balance2 = Balance(value=0, creator=admin, user_id=admin.id)
                 tr1 = Transaction(type='in', cost=100, creator=test_user, user_id=test_user.id)
                 tr2 = Transaction(type='out', cost=500, creator=test_user, user_id=test_user.id)
                 tr3 = Transaction(type='out', cost=500, creator=test_user, user_id=test_user.id)
-                pr1 = Prediction(result='bla-bla', creator=test_user, user_id=test_user.id)
-                pr2 = Prediction(result='Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor', creator=test_user, user_id=test_user.id)
-                pr3 = Prediction(result='Lorem ipsum dolor sit amet.', creator=test_user, user_id=test_user.id)
+                pr1 = Prediction(result='no', user_id=test_user.id, status='done', image='https://alexkam.ru/bg1.jpg')
+                pr2 = Prediction(result='yes', user_id=test_user.id, status='done',image='https://alexkam.ru/bg1.jpg')
+                pr3 = Prediction(result='yes', user_id=test_user.id, status='done',image='https://alexkam.ru/bg1.jpg')
                 create_transaction(tr1, session)
                 create_transaction(tr2, session)
                 create_transaction(tr3, session)

@@ -68,6 +68,7 @@ services:
       - ./app/database:/app/database
       - ./app/models:/app/models
       - ./app/services:/app/services
+      - ./app/auth:/app/auth
     depends_on:
       postgres:
         condition: service_healthy

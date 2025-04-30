@@ -81,8 +81,11 @@
                 })
             }).done(function(data){
                 console.log(data);
-                if(data.result){
+                if(data.result=='true'){
                     window.location.href = '/';
+                }else{
+                    $('#email_user').parent().attr('data-validate','Такой пользователь уже есть')
+                    showValidate($('#email_user'))
                 }
             });
         }

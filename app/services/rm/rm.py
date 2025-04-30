@@ -13,7 +13,7 @@ connection_params = pika.ConnectionParameters(
     blocked_connection_timeout=2
 )
 
-def send_task(message:str):
+def send_task(message:str,  id: int):
     connection = pika.BlockingConnection(connection_params)
     channel = connection.channel()
     
@@ -26,7 +26,10 @@ def send_task(message:str):
     channel.basic_publish(
         exchange='',
         routing_key=queue_name,
-        body=message
+        body=message,
+        properties=pika.BasicProperties(
+            headers={'id': id},
+        )
     )
 
     # Закрытие соединения

@@ -27,11 +27,17 @@ async def index(request: Request, session=Depends(get_session)):
     token = request.cookies.get('token')
     if token is not None:
         user = await authenticate_cookie(token)
+
         cur_user = UsersService.get_user_by_email(user, session)
+        if cur_user.is_admin:
+            users = UsersService.get_all_users(session)
+        else:
+            users = []
         balance = BalanceService.getbalance_by_user_id(cur_user.id, session)
         context = {
             "balance": balance,
             "user": cur_user,
+            "users": users,
             "request": request
         }
         return templates.TemplateResponse("index.html", context)

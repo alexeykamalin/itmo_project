@@ -10,3 +10,5 @@ pydantic
 postgres
 psycopg
 psycopg-binary
+passlib
+fastapi
