@@ -50,6 +50,20 @@ class User(SQLModel, table=True):
         validate_assignment = True
         arbitrary_types_allowed = True
 
+class UserSignup(BaseModel):
+    name: str 
+    email: str
+    password: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "username": "john_doe",
+                "email": "user@example.com",
+                "password": "strongpassword123",
+            }
+        }
+
 class TokenResponse(BaseModel): 
     access_token: str 
     token_type: str

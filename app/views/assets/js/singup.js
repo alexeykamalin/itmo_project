@@ -1,29 +1,8 @@
 
 (function ($) {
     "use strict";
-    $( document ).on('click','.goli2019', function(e){
-        e.preventDefault();
-        $('.hideli2019').toggle();
-    })
-
-
-
     /*==================================================================
     [ Validate ]*/
-    var input = $('.validate-input .input100');
-
-    $('.validate-form').on('submit',function(){
-        var check = true;
-
-        for(var i=0; i<input.length; i++) {
-            if(validate(input[i]) == false){
-                showValidate(input[i]);
-                check=false;
-            }
-        }
-        return check;
-    });
-
 
     $('.validate-form .input100').each(function(){
         $(this).focus(function(){
@@ -55,6 +34,21 @@
 
         $(thisAlert).removeClass('alert-validate');
     }
+    function Validation() {
+        var check = true;
+        $('.validate-form .input100').each(function(){
+            if (validate($(this)) == false){
+                showValidate($(this));
+                check = false;
+            }
+            if($('#pass_user').val() != $('#pass_user_2').val()){
+                showValidate($('#pass_user'));
+                showValidate($('#pass_user_2'));
+                check = false;
+            }
+        });
+        return check
+    }
     
     /*==================================================================
     [ Show pass ]*/
@@ -71,9 +65,26 @@
             $(this).find('i').removeClass('fa-eye-slash');
             $(this).find('i').addClass('fa-eye');
             showPass = 0;
-        }
-        
+        } 
     });
-    
-
+    $('#registration').on('click', function(e){
+        e.preventDefault();
+        if(Validation()){
+            $.ajax({
+                contentType: 'application/json',
+                url: 'api/users/signup',
+                type: 'POST',
+                data: JSON.stringify({
+                    email: $('#email_user').val(),
+                    password: $('#pass_user').val(),
+                    name: $('#name_user').val(),
+                })
+            }).done(function(data){
+                console.log(data);
+                if(data.result){
+                    window.location.href = '/';
+                }
+            });
+        }
+    })
 })(jQuery);

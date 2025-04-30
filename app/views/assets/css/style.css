@@ -29,7 +29,7 @@ table {
 .ball{
 	font-size: 40px;
 }
-.icon{
+.icon, .btn_logout{
 	background-color: white;
 	font-size: 200px;
 	text-align: center;
@@ -41,6 +41,7 @@ table {
 	cursor:pointer;
 	margin-bottom: 30px;
 }
+
 a .text_icon{
 	color: black;
 }
@@ -56,11 +57,14 @@ a .fa-users{
 a .fa-clock{
 	color: black;
 }
-.icon:hover{
+.icon:hover, .btn_logout:hover{
 	box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Параметры тени */
 }
-.text_icon{
+.text_icon, .btn_logout{
 	font-size: 50px;
+}
+.btn_logout{
+	margin: auto;
 }
 .maincontainer {
 	min-height: 100%;
