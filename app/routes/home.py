@@ -25,6 +25,29 @@ templates = Jinja2Templates(directory='views')
 )
 async def index(request: Request, session=Depends(get_session)):
     token = request.cookies.get('token')
+    if token is not None:
+        user = await authenticate_cookie(token)
+        cur_user = UsersService.get_user_by_email(user, session)
+        balance = BalanceService.getbalance_by_user_id(cur_user.id, session)
+        context = {
+            "balance": balance,
+            "user": cur_user,
+            "request": request
+        }
+        return templates.TemplateResponse("index.html", context)
+    else:
+        context = {
+            "result": False,
+            "request": request
+        }
+        return templates.TemplateResponse("login.html", context)
+
+@home_route.get(
+    "/registration", 
+    response_class=HTMLResponse
+)
+async def index(request: Request, session=Depends(get_session)):
+    token = request.cookies.get('token')
     if token:
         user = await authenticate_cookie(token)
         cur_user = UsersService.get_user_by_email(user, session)
@@ -40,8 +63,8 @@ async def index(request: Request, session=Depends(get_session)):
             "result": False,
             "request": request
         }
-        return templates.TemplateResponse("login.html", context)
-
+        return templates.TemplateResponse("registration.html", context)
+    
 @home_route.get(
     "/transactions", 
     response_class=HTMLResponse

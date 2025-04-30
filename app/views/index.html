@@ -12,6 +12,7 @@
     </head>
     <body>
     <div class="container-fluid">
+      <input type="hidden" id='options' user_id="{{user.id}}">
       <div class='main'>
         <div class='row'>
           <div class='col caption'><b>Привет, {{user.name}}!</b> У тебя {% if balance %}{{balance[0]['value']}} {% else %} 0 {% endif %} тугриков</div>
@@ -39,61 +40,42 @@
             </a>
           </div>
           <div class='col-lg-6 col-sm-12'>
-            <div class='icon'>
-                <div class='text_icon'>Что нибудь еще</div>
+            <div style="margin: 0 auto; width: 500px;">
+              <form method="POST" action="/api/users/logout">
+                  <button class='btn_logout'>Выход из аккаунта</button>
+              </form>
             </div>
           </div>
         </div>
         <hr>
       </div>
-    </div>
-  </body>
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Пополнение баланса</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class='row'>
-            <div class='col-lg-12 col-sm-12 alert alert-primary'>
-                Введите количество тугриков
-                <input/>
+    </body>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Пополнение баланса</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class='row'>
+                <div class='col-lg-12 col-sm-12 alert alert-primary'>
+                    Введите количество тугриков
+                    <input id="tugrik"/>
+                </div>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-alert="modal" id="add_balance">Пополнить</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <a href='/api/balance/update_balance'><button type="button" class="btn btn-secondary" data-bs-alert="modal">Пополнить</button></a>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-      </div>
     </div>
-  </div>
-</div>
-
-  
-  <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+<!--===============================================================================================-->
+  {% include '_footer.html' %}
+<!--===============================================================================================-->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-  <script src="/js/jquery.maskedinput-1.2.2.min.js"></script>
   <script src="https://kit.fontawesome.com/0857309370.js" crossorigin="anonymous"></script>
-
-  <script type="text/javascript">
-      jQuery(function($){
-        $("#phone").mask("+7 (999) 999-99-99");
-        $("#snils").mask("999-999-999 99");
-        $("#snils_parent").mask("999-999-999 99");
-        
-      });
-      function vali(evt) {
-        var theEvent = evt || window.event;
-        var key = theEvent.keyCode || theEvent.which;
-        key = String.fromCharCode( key );
-        var regex = /[0-9]|\./;
-        if( !regex.test(key) ) {
-          theEvent.returnValue = false;
-          if(theEvent.preventDefault) theEvent.preventDefault();
-        }
-      }
-  </script>
-  <script type="text/javascript" src='/js/intensive.js?ver2'></script>
+	<script src="{{ url_for('static', path='/js/index.js') }}"></script>
 </html>

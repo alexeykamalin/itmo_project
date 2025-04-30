@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship, Column, func, DateTime
 from typing import Optional, List, TYPE_CHECKING
 
@@ -18,3 +19,15 @@ class Balance(SQLModel, table=True):
     creator: Optional['User']= Relationship(
         back_populates="balance"
     )
+
+class BalanceUpdate(BaseModel):
+    value: int 
+    user_id: int
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "value": 100,
+                "user_id": 1,
+            }
+        }

@@ -6,7 +6,12 @@ from auth.jwt_handler import create_access_token
 from database.database import get_session, get_settings
 from models.user import TokenResponse, User
 from services.crud import user as UserService
+from services.crud import balance as BalanceService
+from models.user import UserSignup
+from models.balance import Balance
+
 from typing import List, Dict
+import json
 import logging
 
 # Configure logging
@@ -20,20 +25,7 @@ user_route = APIRouter()
     status_code=status.HTTP_201_CREATED,
     summary="User Registration",
     description="Register a new user with email and password")
-async def signup(data: User, session=Depends(get_session)) -> Dict[str, str]:
-    """
-    Create new user account.
-
-    Args:
-        data: User registration data
-        session: Database session
-
-    Returns:
-        dict: Success message
-
-    Raises:
-        HTTPException: If user already exists
-    """
+async def signup(data: UserSignup, session=Depends(get_session)) -> Dict[str, str]:
     try:
         if UserService.get_user_by_email(data.email, session):
             logger.warning(f"Signup attempt with existing email: {data.email}")
@@ -44,10 +36,13 @@ async def signup(data: User, session=Depends(get_session)) -> Dict[str, str]:
 
         user = User(
             email=data.email,
-            password=data.password)
-        UserService.create_user(user, session)
+            password=HashPassword().create_hash(data.password),
+            name=data.name)
+        new_user = UserService.create_user(user, session)
+        balance = Balance(value=0, creator=new_user, user_id=new_user.id)
+        BalanceService.create_balance(balance, session)
         logger.info(f"New user registered: {data.email}")
-        return {"message": "User successfully registered"}
+        return {"result": "true"}
 
     except Exception as e:
         logger.error(f"Error during signup: {str(e)}")
@@ -77,7 +72,7 @@ async def sign_user_in(user: OAuth2PasswordRequestForm = Depends(), session=Depe
 @user_route.post("/logout")
 async def logout_user() -> dict: 
     response = RedirectResponse("/", status_code=303)
-    response.set_cookie(key="token", value='')
+    response.delete_cookie("token")
     return response 
 
 @user_route.get(
