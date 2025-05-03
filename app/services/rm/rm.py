@@ -31,6 +31,6 @@ def send_task(message:str,  id: int):
             headers={'id': id},
         )
     )
-
     # Закрытие соединения
     connection.close()
+    return 'true'

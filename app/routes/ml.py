@@ -10,13 +10,7 @@ ml_route = APIRouter()
     summary="ML endpoint",
     description="Send ml request"
 )
-async def index(message:str, id: int) -> str:
-    """
-    Root endpoint returning welcome message.
-
-    Returns:
-        Dict[str, str]: Welcome message
-    """
+async def index(message:str, id: int) -> Dict[str, str]:
     try:
         send_task(message, id)
         return {"result": 'true'}
