@@ -38,6 +38,7 @@ model = Qwen2VLForConditionalGeneration.from_pretrained(
 processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
 # Функция, которая будет вызвана при получении сообщения
 def callback(ch, method, properties, body):
+    logger.info("1 %s", 'lol')
     try:
         messages = [
             {
@@ -45,15 +46,17 @@ def callback(ch, method, properties, body):
                 "content": [
                     {
                         "type": "image",
-                        "image": body,
+                        "image": body.decode("utf-8"),
                     },
                     {"type": "text", "text": "Describe this image."},
                 ],
             }
         ]
+        logger.info("2")
         text = processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
+        logger.info("3")
         image_inputs, video_inputs = process_vision_info(messages)
         inputs = processor(
             text=[text],
@@ -62,6 +65,7 @@ def callback(ch, method, properties, body):
             padding=True,
             return_tensors="pt",
         )
+        logger.info("4")
         inputs = inputs.to("cuda")
         generated_ids = model.generate(**inputs, max_new_tokens=128)
         generated_ids_trimmed = [
@@ -70,18 +74,16 @@ def callback(ch, method, properties, body):
         output_text = processor.batch_decode(
             generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )
-        print('Тут пока заглушка, хочу получить ответ от МЛ', output_text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
-
-
+        logger.info('-------------------------------------------------------------------------------конец задачи')
+        # logger.info('Тут пока заглушка, хочу получить ответ от МЛ: %s', output_text)
+    except:
+        pass
 
 # Подписка на очередь и установка обработчика сообщений
 channel.basic_consume(
     queue=queue_name,
     on_message_callback=callback,
-    auto_ack=False  # Автоматическое подтверждение обработки сообщений
+    auto_ack=True  # Автоматическое подтверждение обработки сообщений
 )
 
-logger.info('Waiting for messages. To exit, press Ctrl+C')
 channel.start_consuming()
