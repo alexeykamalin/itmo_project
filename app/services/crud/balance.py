@@ -18,6 +18,7 @@ def create_balance(balance: Balance, session: Session) -> Balance:
         raise
 
 def getbalance_by_user_id(user_id: int, session: Session) -> Balance:
+
     """
     """
     try:

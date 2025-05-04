@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from database.database import get_session
 from models.prediction import Prediction, PredictionUpdate
+from models.balance import Balance
+from models.transaction import Transaction
 from services.crud import prediction as PredictionService
 from services.crud import user as UserService
+from services.crud import balance as BalanceService
+from services.crud import transaction as TransactionService
 from services.rm import rm as RmTask
 from typing import List, Dict
 import logging
@@ -22,16 +26,34 @@ async def create_prediction(data: Prediction, session=Depends(get_session)) -> D
     """
     """
     try:
-        prediction = Prediction(
-            status='in_progress',
-            user_id=data.user_id,
-            image=data.image,
-            result='in_progress'
-        )
-        result = PredictionService.create_prediction(prediction, session)
-        task = RmTask.send_task(data.image, result.id)
-        logger.info(f"New prediction: {data.user_id}, {data.status}, {task}")
-        return {"message": "New prediction complite", "task": task}
+        balance = BalanceService.getbalance_by_user_id(data.user_id, session)
+        if balance[0].value < 500:
+            return {"result": "false", "message": "no limits"}
+        else:
+            prediction = Prediction(
+                status='in_progress',
+                user_id=data.user_id,
+                image=data.image,
+                result='in_progress'
+            )
+            result = PredictionService.create_prediction(prediction, session)
+            task = RmTask.send_task(data.image, result.id)
+            
+            new_value = balance[0].value - 500
+            
+            new_balance = Balance(
+                value=new_value,
+                user_id=data.user_id,
+            )
+            transaction = Transaction(
+                cost=500,
+                type='out',
+                user_id=data.user_id)
+            TransactionService.create_transaction(transaction, session)
+            BalanceService.updatebalance(new_balance, data.user_id, session)
+
+            logger.info(f"New prediction: {data.user_id}, {data.status}, {task}")
+            return {"result": "true"}
 
     except Exception as e:
         logger.error(f"Error during add_prediction: {str(e)}")
@@ -70,24 +92,18 @@ async def get_all_predictions_by_user_id(user_id: int, session=Depends(get_sessi
 async def update_prediction(data: PredictionUpdate, session=Depends(get_session)) -> Dict[str, str]:
     
     try:
-        pass
-        # balance = PredictionService.getprediction_by_user_id(data.user_id, session)
-        # new_balance = Prediction(
-        #     value=balance[0].value + data.value,
-        #     user_id=data.user_id,
-        # )
-        # balance = Balance(
-        #     cost=data.value,
-        #     type='in',
-        #     user_id=data.user_id)
-        # TransactionService.create_transaction(transaction, session)
-        # BalanceService.updatebalance(new_balance, data.user_id, session)
-        # logger.info(f"Balance: {data.user_id}, {data.value}")
-        # return {"result": 'true'}
+        new_prediction = Prediction(
+            result=data.result,
+            status='done',
+            id=data.id,
+        )
+        PredictionService.updateprediction(new_prediction, data.id, session)
+        logger.info(f"Balance: {data.user_id}, {data.value}")
+        return {"result": 'true'}
 
     except Exception as e:
-        logger.error(f"Error during update_balance: {str(e)}")
+        logger.error(f"Error during update_prediction: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error during balance"
+            detail="Error during prediction"
         )
