@@ -57,7 +57,7 @@ async def index(request: Request, session=Depends(get_session)):
     if token:
         user = await authenticate_cookie(token)
         cur_user = UsersService.get_user_by_email(user, session)
-        balance = BalanceService.get_balance_by_user_id(cur_user.id, session)
+        balance = BalanceService.getbalance_by_user_id(cur_user.id, session)
         context = {
             "balance": balance,
             "user": cur_user,
@@ -80,11 +80,13 @@ async def transaction(request: Request, session=Depends(get_session)):
     if token:
         user = await authenticate_cookie(token)
         cur_user = UsersService.get_user_by_email(user, session)
+        balance = BalanceService.getbalance_by_user_id(cur_user.id, session)
         tranactions = TransactionService.get_all_transactions_by_user_id(cur_user.id, session)
         context = {
             "transactions": tranactions,
             "user": cur_user,
-            "request": request
+            "request": request,
+            "balance": balance
         }
         return templates.TemplateResponse("transactions.html", context)
     else:
@@ -103,11 +105,13 @@ async def prediction(request: Request, session=Depends(get_session)):
     if token:
         user = await authenticate_cookie(token)
         cur_user = UsersService.get_user_by_email(user, session)
+        balance = BalanceService.getbalance_by_user_id(cur_user.id, session)
         predictions = PredictionService.get_all_predictions_by_user_id(cur_user.id, session)
         context = {
             "predictions": predictions,
             "user": cur_user,
-            "request": request
+            "request": request,
+            "balance": balance
         }
         return templates.TemplateResponse("predictions.html", context)
     else:

@@ -27,6 +27,7 @@ class Prediction(SQLModel, table=True):
 class PredictionUpdate(BaseModel):
     status: str 
     id: int
+    result: str
     
     class Config:
         json_schema_extra = {

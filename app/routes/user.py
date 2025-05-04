@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
 from database.database import get_session, get_settings
-from models.user import TokenResponse, User
+from models.user import TokenResponse, User, DeleteUser
 from services.crud import user as UserService
 from services.crud import balance as BalanceService
 from models.user import UserSignup
@@ -123,4 +123,25 @@ async def create_user(data: User, session=Depends(get_session)) -> Dict[str, str
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error during create_user"
+        )
+
+@user_route.post(
+    '/delete_user',
+    response_model=Dict[str, str],
+    status_code=status.HTTP_201_CREATED,
+    summary="",
+    description="")  
+async def delete_user(data: DeleteUser, session=Depends(get_session)) -> Dict[str, str]:
+    """
+    """
+    try:
+        UserService.delete_user(data.user_id, session)
+        logger.info(f"user deleted: {data.user_id}")
+        return {"result": "true"}
+
+    except Exception as e:
+        logger.error(f"Error during delete_user: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error during delete_user"
         )

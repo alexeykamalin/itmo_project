@@ -38,7 +38,7 @@ model = Qwen2VLForConditionalGeneration.from_pretrained(
 processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
 # Функция, которая будет вызвана при получении сообщения
 def callback(ch, method, properties, body):
-    logger.info("1 %s", 'lol')
+    logger.info("1. Задача получена")
     try:
         messages = [
             {
@@ -52,11 +52,9 @@ def callback(ch, method, properties, body):
                 ],
             }
         ]
-        logger.info("2")
         text = processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
-        logger.info("3")
         image_inputs, video_inputs = process_vision_info(messages)
         inputs = processor(
             text=[text],
@@ -65,19 +63,39 @@ def callback(ch, method, properties, body):
             padding=True,
             return_tensors="pt",
         )
-        logger.info("4")
-        inputs = inputs.to("cuda")
-        generated_ids = model.generate(**inputs, max_new_tokens=128)
+        try:
+            logger.info("2. Перемещаем inputs на GPU")
+            inputs = inputs.to("cuda")
+            
+            logger.info("3. Запускаем генерацию...")
+            generated_ids = model.generate(**inputs, max_new_tokens=128)
+            
+            logger.info("4. Генерация завершена")
+        except RuntimeError as e:
+            logger.error(f"Ошибка CUDA: {e}")
+        except Exception as e:
+            logger.error(f"Неожиданная ошибка: {e}")
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
         ]
+        logger.info("6. Генерация завершена")
         output_text = processor.batch_decode(
             generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
         )
-        logger.info('-------------------------------------------------------------------------------конец задачи')
-        # logger.info('Тут пока заглушка, хочу получить ответ от МЛ: %s', output_text)
-    except:
-        pass
+        logger.info('7. Конец задачи')
+        session = next(get_session())
+        res = 'yes' if ' car ' in output_text[0] else 'no'
+        prediction = PredictionUpdate(
+            status='done',
+            id=properties.headers.get('id'),
+            result=res
+        )
+        updateprediction(prediction, properties.headers.get('id'), session)
+        
+        logger.info('7. Конец задачи %s',properties.headers.get('id'))
+        logger.info('8. Пропертис %s', output_text)
+    except Exception as e:
+        logger.exception(e)
 
 # Подписка на очередь и установка обработчика сообщений
 channel.basic_consume(

@@ -36,14 +36,16 @@ def create_prediction(prediction: Prediction, session: Session) -> Prediction:
         session.rollback()
         raise
 
-def updateprediction(prediction: Prediction, user_id: int, session: Session) -> Prediction:
+def updateprediction(prediction: Prediction, id: int, session: Session) -> Prediction:
     """
     """
+    print('----------------------------------------------------------------------', id)
     try:
-        new_prediction = session.exec(select(Prediction).where(Prediction.user_id == user_id)).one()
+        new_prediction = session.exec(select(Prediction).where(Prediction.id == id)).one()
         new_prediction.status = prediction.status
+        new_prediction.result = prediction.result
         session.commit()
-        return prediction
+        return new_prediction
     except Exception as e:
         session.rollback()
         raise
